@@ -104,6 +104,37 @@ type SMSMessage struct {
 	Validity int    `json:"validity,omitempty"` // Duration WAP Push is available in milliseconds
 }
 
+// MessageStatusResponse defines information about a single message that was sent using SMS API.
+// See https://developer.nexmo.com/api/developer/messages for details.
+type MessageStatusResponse struct {
+	MessageId      string `json:"message-id,omitempty"`
+	AccountId      string `json:"account-id,omitempty"`
+	Network        string `json:"network,omitempty"`
+	From           string `json:"from,omitempty"`
+	To             string `json:"to,omitempty"`
+	Body           string `json:"body,omitempty"`
+	Price          string `json:"price,omitempty"`
+	DateReceived   string `json:"date-received,omitempty"`
+	Status         string `json:"status,omitempty"`
+	FinalStatus    string `json:"final-status,omitempty"`
+	DateClosed     string `json:"date-closed,omitempty"`
+	Latency        int    `json:"latency,omitempty"`
+	Type           string `json:"type,omitempty"`
+	ClientRef      string `json:"client-ref,omitempty"`
+	ErrorCode      string `json:"error-code,omitempty"`
+	ErrorCodeLabel string `json:"error-code-label,omitempty"`
+	RawBody        []byte
+	HttpStatusCode int
+}
+
+// MessageStatusRequest request for search message status
+// See https://developer.nexmo.com/api/developer/messages for details.
+type MessageStatusRequest struct {
+	apiKey    string
+	apiSecret string
+	ID        string `json:"id"`
+}
+
 // A ResponseCode will be returned
 // whenever an SMSMessage is sent.
 type ResponseCode int
@@ -243,4 +274,49 @@ func (c *SMS) Send(msg *SMSMessage) (*MessageResponse, error) {
 		return nil, err
 	}
 	return messageResponse, nil
+}
+
+// MessageStatus retrieves information about a single message that was sent using SMS API or that was received on your number.
+// See https://developer.nexmo.com/api/developer/messages for details.
+func (c *SMS) MessageStatus(msg *MessageStatusRequest) (*MessageStatusResponse, error) {
+	if len(msg.ID) == 0 {
+		return nil, errors.New("ID should not be empty")
+	}
+
+	if !c.client.useOauth {
+		msg.apiKey = c.client.apiKey
+		msg.apiSecret = c.client.apiSecret
+	}
+
+	var (
+		r   *http.Request
+		err error
+	)
+	r, err = http.NewRequest("GET", apiRoot+"/search/message/"+msg.apiKey+"/"+msg.apiSecret+"/"+msg.ID, nil)
+	if err != nil {
+		return nil, err
+	}
+	r.Header.Add("Accept", "application/json")
+
+	var resp *http.Response
+	if resp, err = c.client.HTTPClient.Do(r); err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var body []byte
+	if body, err = ioutil.ReadAll(resp.Body); err != nil {
+		return nil, err
+	}
+
+	var messageStatusResponse = &MessageStatusResponse{
+		RawBody:        body,
+		HttpStatusCode: resp.StatusCode,
+	}
+
+	err = json.Unmarshal(body, &messageStatusResponse)
+	if err != nil {
+		return messageStatusResponse, err
+	}
+	return messageStatusResponse, nil
 }
