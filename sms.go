@@ -292,10 +292,17 @@ func (c *SMS) MessageStatus(msg *MessageStatusRequest) (*MessageStatusResponse, 
 		r   *http.Request
 		err error
 	)
-	r, err = http.NewRequest("GET", apiRoot+"/search/message/"+msg.apiKey+"/"+msg.apiSecret+"/"+msg.ID, nil)
+	r, err = http.NewRequest("GET", apiRoot+"/search/message", nil)
 	if err != nil {
 		return nil, err
 	}
+
+	q := r.URL.Query()
+	q.Add("api_key", msg.apiKey)
+	q.Add("api_secret", msg.apiSecret)
+	q.Add("id", msg.ID)
+	r.URL.RawQuery = q.Encode()
+
 	r.Header.Add("Accept", "application/json")
 
 	var resp *http.Response
