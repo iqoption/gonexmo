@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-// Report represents the Report API functions for sending text messages.
+// Reports represents the Reports API functions for sending text messages.
 // https://developer.vonage.com/en/api/reports
-type Report struct {
+type Reports struct {
 	client *Client
 }
 
@@ -103,7 +103,7 @@ type RecordsResponse struct {
 }
 
 // Send the message using the specified Nexmo API client.
-func (c *Report) Send(req *RecordsRequest) (*RecordsResponse, error) {
+func (c *Reports) Send(req *RecordsRequest) (*RecordsResponse, error) {
 	var r, err = http.NewRequest("GET", apiRootv2+"/v2/reports/records", nil)
 	if err != nil {
 		return nil, err
