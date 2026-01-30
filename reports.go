@@ -45,7 +45,6 @@ const (
 
 // RecordsRequest defines a records request message.
 type RecordsRequest struct {
-	AccountID string
 	ID        string
 	Product   string
 	Direction string
@@ -110,7 +109,7 @@ func (c *Reports) Send(req *RecordsRequest) (*RecordsResponse, error) {
 	}
 
 	var q = r.URL.Query()
-	q.Add("account_id", req.AccountID)
+	q.Add("account_id", c.client.apiKey)
 	q.Add("id", req.ID)
 	q.Add("product", req.Product)
 	q.Add("direction", req.Direction)
