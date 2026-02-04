@@ -3,6 +3,7 @@ package nexmo
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -126,9 +127,26 @@ func (c *Reports) Send(req *RecordsRequest) (*RecordsResponse, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode >= 500 {
+		return nil, fmt.Errorf("internal server error: %d", resp.StatusCode)
+	}
+
 	var body []byte
 	if body, err = ioutil.ReadAll(resp.Body); err != nil {
 		return nil, err
+	}
+
+	if resp.StatusCode >= 400 {
+		var errMsg = Error{
+			HTTPStatus: resp.StatusCode,
+		}
+
+		err = json.Unmarshal(body, &errMsg)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, &errMsg
 	}
 
 	var records RecordsResponse
@@ -136,5 +154,6 @@ func (c *Reports) Send(req *RecordsRequest) (*RecordsResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &records, nil
 }
