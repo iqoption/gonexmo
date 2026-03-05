@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 // Reports represents the Reports API functions for sending text messages.
@@ -55,50 +54,50 @@ type RecordsRequest struct {
 type RecordsResponse struct {
 	Links struct {
 		Self struct {
-			Href time.Time `json:"href"`
+			Href string `json:"href"`
 		} `json:"self"`
 		Next struct {
 			Href string `json:"href"`
 		} `json:"next"`
 	} `json:"_links"`
-	Cursor        string    `json:"cursor"`
-	Iv            string    `json:"iv"`
-	RequestID     string    `json:"request_id"`
-	RequestStatus string    `json:"request_status"`
-	ReceivedAt    time.Time `json:"received_at"`
-	ItemsCount    int       `json:"items_count"`
-	IdsNotFound   string    `json:"ids_not_found"`
-	Product       string    `json:"product"`
+	Cursor        string `json:"cursor"`
+	Iv            string `json:"iv"`
+	RequestID     string `json:"request_id"`
+	RequestStatus string `json:"request_status"`
+	ReceivedAt    string `json:"received_at"`
+	ItemsCount    int    `json:"items_count"`
+	IdsNotFound   string `json:"ids_not_found"`
+	Product       string `json:"product"`
 	Records       []struct {
-		AccountID            string    `json:"account_id"`
-		MessageID            string    `json:"message_id"`
-		AccountRef           string    `json:"account_ref"`
-		ClientRef            string    `json:"client_ref"`
-		Direction            string    `json:"direction"`
-		From                 string    `json:"from"`
-		To                   string    `json:"to"`
-		ForcedFrom           string    `json:"forced_from"`
-		ChangedFrom          string    `json:"changed_from"`
-		Concatenated         string    `json:"concatenated"`
-		MessageBody          string    `json:"message_body"`
-		Network              string    `json:"network"`
-		NetworkName          string    `json:"network_name"`
-		Country              string    `json:"country"`
-		CountryName          string    `json:"country_name"`
-		DateReceived         time.Time `json:"date_received"`
-		DateFinalized        time.Time `json:"date_finalized"`
-		Latency              string    `json:"latency"`
-		Status               string    `json:"status"`
-		ErrorCode            string    `json:"error_code"`
-		ErrorCodeDescription string    `json:"error_code_description"`
-		Currency             string    `json:"currency"`
-		TotalPrice           string    `json:"total_price"`
-		ID                   string    `json:"id"`
-		Dcs                  string    `json:"dcs"`
-		ValidityPeriod       string    `json:"validity_period"`
-		IPAddress            string    `json:"ip_address"`
-		Udh                  string    `json:"udh"`
-		WorkflowID           string    `json:"workflow_id"`
+		AccountID            string `json:"account_id"`
+		MessageID            string `json:"message_id"`
+		AccountRef           string `json:"account_ref"`
+		ClientRef            string `json:"client_ref"`
+		Direction            string `json:"direction"`
+		From                 string `json:"from"`
+		To                   string `json:"to"`
+		ForcedFrom           string `json:"forced_from"`
+		ChangedFrom          string `json:"changed_from"`
+		Concatenated         string `json:"concatenated"`
+		MessageBody          string `json:"message_body"`
+		Network              string `json:"network"`
+		NetworkName          string `json:"network_name"`
+		Country              string `json:"country"`
+		CountryName          string `json:"country_name"`
+		DateReceived         string `json:"date_received"`
+		DateFinalized        string `json:"date_finalized"`
+		Latency              string `json:"latency"`
+		Status               string `json:"status"`
+		ErrorCode            string `json:"error_code"`
+		ErrorCodeDescription string `json:"error_code_description"`
+		Currency             string `json:"currency"`
+		TotalPrice           string `json:"total_price"`
+		ID                   string `json:"id"`
+		Dcs                  string `json:"dcs"`
+		ValidityPeriod       string `json:"validity_period"`
+		IPAddress            string `json:"ip_address"`
+		Udh                  string `json:"udh"`
+		WorkflowID           string `json:"workflow_id"`
 	} `json:"records"`
 }
 
@@ -116,7 +115,7 @@ func (c *Reports) Send(req *RecordsRequest) (*RecordsResponse, error) {
 	q.Add("direction", req.Direction)
 	r.URL.RawQuery = q.Encode()
 
-	var auth = base64.RawURLEncoding.EncodeToString([]byte(c.client.apiKey + ":" + c.client.apiSecret))
+	var auth = base64.StdEncoding.EncodeToString([]byte(c.client.apiKey + ":" + c.client.apiSecret))
 
 	r.Header.Add("Authorization", "Basic "+auth)
 	r.Header.Add("Accept", "application/json")
