@@ -114,6 +114,7 @@ func (c *Reports) Send(req *RecordsRequest) (*RecordsResponse, error) {
 	q.Add("id", req.ID)
 	q.Add("product", req.Product)
 	q.Add("direction", req.Direction)
+	r.URL.RawQuery = q.Encode()
 
 	var auth = base64.RawURLEncoding.EncodeToString([]byte(c.client.apiKey + ":" + c.client.apiSecret))
 
